@@ -15,6 +15,8 @@ distance follows the finger immediately, release velocity uses touch-event
 timestamps, and normal viewport rendering runs independently. Two screens of
 directional buffering limit render work. The old four-screen coverage gate is
 available with `waitForRendering: true` for diagnostic comparisons.
+Unrestricted momentum follows elapsed spline time through slow frames; the
+120 ms blocked-render cutoff applies only to the coverage-gated mode.
 The language fork adds generation-scoped provisional
 outer-language highlighting in stable 128-line windows. It retains up to 12
 completed windows and prepares two windows beyond each viewport edge. Scrolling

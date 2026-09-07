@@ -6,7 +6,7 @@
   "src/bidi.ts": "16a57a6696591304d38b4ed678956f13f06d9e8ba98acc201edfe5dc3a1e85c5",
   "src/browser.ts": "d1540ead543bf8c04b35c77e335a92b30baa26d1089865deb43c7d9e53167686",
   "src/buildtile.ts": "361a0e0c62b1f747e87d74a2a9aa1cf13d119e9ae3b789d2250ef1a45d08d8a6",
-  "src/controlled-scroll.ts": "36410cf319049ff728d402eb793d29b872f4f35dfecf526c1059bed84cd3888d",
+  "src/controlled-scroll.ts": "246151527dbf7f7dcb9cae65e7e980c335fff3cadbb344e4d5f2fd7b7cb94be4",
   "src/cursor.ts": "e5735ecd84c9b139f78679562772f4ade6697ac40478c729285a3203c8329172",
   "src/decoration.ts": "0b59d18b4662edde70b477cc1a8c38aa83d23e7083ec7113715ca3adcef632dd",
   "src/dialog.ts": "45d7ea07486cfeb7bcc663613407590f24c144195364566f7dfe408bb26be7da",

@@ -138,10 +138,10 @@ index 0000000..8a3f7be
 +}
 diff --git a/src/controlled-scroll.ts b/src/controlled-scroll.ts
 new file mode 100644
-index 0000000..9591f72
+index 0000000..85ac89b
 --- /dev/null
 +++ b/src/controlled-scroll.ts
-@@ -0,0 +1,847 @@
+@@ -0,0 +1,850 @@
 +import browser from "./browser"
 +import type {Transaction} from "@codemirror/state"
 +import type {EditorView} from "./editorview"
@@ -901,7 +901,10 @@ index 0000000..9591f72
 +    let sample = sampleAndroidSpline(fling, elapsed)
 +    let rawDelta = sample.distance - this.momentumDistance
 +    let frameTime = Math.max(0, elapsed - this.momentumElapsed)
-+    if (frameTime >= MaximumBlockedTime) {
++    // Only the coverage-gated mode can run out of safe rendered movement.
++    // A busy main thread must not cancel an unrestricted fling: sample its
++    // elapsed physical time so it resumes with the correct decayed velocity.
++    if (this.config?.waitForRendering && frameTime >= MaximumBlockedTime) {
 +      this.finishMomentum("render-limited")
 +      return
 +    }
@@ -935,7 +938,7 @@ index 0000000..9591f72
 +    if (atDocumentEdge) this.finishMomentum("edge")
 +    else if (sample.done || Math.abs(sample.velocity) < AndroidMinimumFlingVelocity)
 +      this.finishMomentum(this.momentumRenderLimited ? "render-limited" : "completed")
-+    else if (now - this.lastMomentumCommit >= MaximumBlockedTime)
++    else if (this.config?.waitForRendering && now - this.lastMomentumCommit >= MaximumBlockedTime)
 +      this.finishMomentum("render-limited")
 +    else
 +      this.scheduleMomentum()

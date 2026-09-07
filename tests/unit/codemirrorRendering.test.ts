@@ -964,6 +964,45 @@ describe("vendored CodeMirror rendering interfaces", () => {
 		}
 	});
 
+	it.each([
+		120, 250, 500,
+	])("continues unrestricted momentum after a %ims frame", (delay) => {
+		const harness = controlledScrollHarness(
+			{ from: 0, to: 1200 },
+			{ waitForRendering: false, scrollHeight: 100_000 },
+		);
+		try {
+			harness.scrollDOM.dispatchEvent(touchEvent("touchstart", 100, 500, 1, 0));
+			harness.runFrame();
+			harness.scrollDOM.dispatchEvent(touchEvent("touchmove", 100, 400, 1, 16));
+			harness.runFrame();
+			harness.scrollDOM.dispatchEvent(touchEvent("touchmove", 100, 300, 1, 32));
+			harness.scrollDOM.dispatchEvent(touchEvent("touchend", 100, 300, 0, 32));
+			const initial = harness.controller.debugSnapshot();
+			expect(initial.active).toBe(true);
+			const before = harness.scrollTop;
+			harness.runFrame(delay);
+			const resumed = harness.controller.debugSnapshot();
+			expect(resumed.active).toBe(true);
+			expect(resumed.termination).toBeNull();
+			expect(harness.scrollTop).toBeGreaterThan(before);
+			for (
+				let frame = 0;
+				frame < 300 && harness.controller.debugSnapshot().active;
+				frame++
+			)
+				harness.runFrame(frame % 5 === 0 ? delay : 16);
+			const result = harness.controller.debugSnapshot();
+			expect(result.termination).toBe("completed");
+			expect(result.committedDistance).toBeCloseTo(
+				initial.expectedDistance,
+				-1,
+			);
+		} finally {
+			harness.controller.destroy();
+		}
+	});
+
 	it("stops before moving after 120ms without covered progress", () => {
 		const harness = controlledScrollHarness(
 			{ from: 0, to: 10_000 },

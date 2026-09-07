@@ -8342,7 +8342,7 @@ class ControlledTouchScroll {
             this.continueIdlePrewarm();
         };
         this.applyMomentum = () => {
-            var _a, _b;
+            var _a, _b, _c, _d;
             this.momentumFrame = -1;
             let fling = this.fling;
             if (!this.momentum || !fling)
@@ -8352,14 +8352,17 @@ class ControlledTouchScroll {
             let sample = sampleAndroidSpline(fling, elapsed);
             let rawDelta = sample.distance - this.momentumDistance;
             let frameTime = Math.max(0, elapsed - this.momentumElapsed);
-            if (frameTime >= MaximumBlockedTime) {
+            // Only the coverage-gated mode can run out of safe rendered movement.
+            // A busy main thread must not cancel an unrestricted fling: sample its
+            // elapsed physical time so it resumes with the correct decayed velocity.
+            if (((_a = this.config) === null || _a === void 0 ? void 0 : _a.waitForRendering) && frameTime >= MaximumBlockedTime) {
                 this.finishMomentum("render-limited");
                 return;
             }
             let maximumStep = Math.abs(previousSample.velocity) * Math.min(MaximumMomentumFrame, frameTime) / 1000;
-            let delta = ((_a = this.config) === null || _a === void 0 ? void 0 : _a.waitForRendering)
+            let delta = ((_b = this.config) === null || _b === void 0 ? void 0 : _b.waitForRendering)
                 ? Math.sign(rawDelta) * Math.min(Math.abs(rawDelta), maximumStep) : rawDelta;
-            if (((_b = this.config) === null || _b === void 0 ? void 0 : _b.waitForRendering) && frameTime > MaximumMomentumFrame + .5)
+            if (((_c = this.config) === null || _c === void 0 ? void 0 : _c.waitForRendering) && frameTime > MaximumMomentumFrame + .5)
                 this.momentumRenderLimited = true;
             this.momentumElapsed = elapsed;
             this.momentumDistance = sample.distance;
@@ -8386,7 +8389,7 @@ class ControlledTouchScroll {
                 this.finishMomentum("edge");
             else if (sample.done || Math.abs(sample.velocity) < AndroidMinimumFlingVelocity)
                 this.finishMomentum(this.momentumRenderLimited ? "render-limited" : "completed");
-            else if (now - this.lastMomentumCommit >= MaximumBlockedTime)
+            else if (((_d = this.config) === null || _d === void 0 ? void 0 : _d.waitForRendering) && now - this.lastMomentumCommit >= MaximumBlockedTime)
                 this.finishMomentum("render-limited");
             else
                 this.scheduleMomentum();

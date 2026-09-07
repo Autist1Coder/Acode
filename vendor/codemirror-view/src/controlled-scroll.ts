@@ -757,7 +757,10 @@ export class ControlledTouchScroll {
     let sample = sampleAndroidSpline(fling, elapsed)
     let rawDelta = sample.distance - this.momentumDistance
     let frameTime = Math.max(0, elapsed - this.momentumElapsed)
-    if (frameTime >= MaximumBlockedTime) {
+    // Only the coverage-gated mode can run out of safe rendered movement.
+    // A busy main thread must not cancel an unrestricted fling: sample its
+    // elapsed physical time so it resumes with the correct decayed velocity.
+    if (this.config?.waitForRendering && frameTime >= MaximumBlockedTime) {
       this.finishMomentum("render-limited")
       return
     }
@@ -791,7 +794,7 @@ export class ControlledTouchScroll {
     if (atDocumentEdge) this.finishMomentum("edge")
     else if (sample.done || Math.abs(sample.velocity) < AndroidMinimumFlingVelocity)
       this.finishMomentum(this.momentumRenderLimited ? "render-limited" : "completed")
-    else if (now - this.lastMomentumCommit >= MaximumBlockedTime)
+    else if (this.config?.waitForRendering && now - this.lastMomentumCommit >= MaximumBlockedTime)
       this.finishMomentum("render-limited")
     else
       this.scheduleMomentum()
