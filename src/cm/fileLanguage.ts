@@ -35,14 +35,22 @@ export function preloadFileLanguage(file: FileLanguage): Promise<void> {
 	);
 }
 
-/** Do not publish restored text until an already-started language load finishes. */
+/** Briefly await highlighting, then let text open with language loading in the background. */
 export async function waitForFileLanguage(file: FileLanguage): Promise<void> {
 	const entry = prepared.get(file);
 	if (entry && entry.provider === file.currentLanguageExtension) {
+		let timer: ReturnType<typeof setTimeout> | undefined;
 		try {
-			await entry.value;
+			await Promise.race([
+				entry.value,
+				new Promise<void>((resolve) => {
+					timer = setTimeout(resolve, 250);
+				}),
+			]);
 		} catch {
 			/* A failed language must not prevent opening the file. */
+		} finally {
+			clearTimeout(timer);
 		}
 	}
 }

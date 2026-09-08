@@ -258,7 +258,7 @@ describe("vendored CodeMirror rendering interfaces", () => {
 
 	it("claims only deliberate vertical gestures", () => {
 		expect(__test.claimControlledTouchGesture(2, 5)).toBe("pending");
-		expect(__test.claimControlledTouchGesture(8, 7)).toBe("horizontal");
+		expect(__test.claimControlledTouchGesture(8, 7)).toBe("vertical");
 		expect(__test.claimControlledTouchGesture(4, 8)).toBe("vertical");
 		expect(__test.claimControlledTouchGesture(0, -8)).toBe("vertical");
 	});
@@ -390,6 +390,29 @@ describe("vendored CodeMirror rendering interfaces", () => {
 		} finally {
 			harness.controller.destroy();
 			vi.useRealTimers();
+		}
+	});
+
+	it.each([
+		[10, 12],
+		[-10, 12],
+		[10, -12],
+		[-10, -12],
+		[12, 10],
+		[10, 10],
+	])("scrolls diagonal swipes (%i, %i) vertically", (dx, dy) => {
+		const harness = controlledScrollHarness(undefined, {
+			waitForRendering: false,
+		});
+		try {
+			expect(harness.scrollDOM.style.touchAction).toBe("pan-x");
+			harness.scrollDOM.dispatchEvent(touchEvent("touchstart", 100, 500));
+			const move = touchEvent("touchmove", 100 + dx, 500 + dy);
+			harness.scrollDOM.dispatchEvent(move);
+			expect(move.defaultPrevented).toBe(true);
+			expect(harness.scrollTop).toBe(500 - dy);
+		} finally {
+			harness.controller.destroy();
 		}
 	});
 

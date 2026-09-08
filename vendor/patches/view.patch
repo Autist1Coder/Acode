@@ -138,10 +138,10 @@ index 0000000..8a3f7be
 +}
 diff --git a/src/controlled-scroll.ts b/src/controlled-scroll.ts
 new file mode 100644
-index 0000000..85ac89b
+index 0000000..6a0f9c5
 --- /dev/null
 +++ b/src/controlled-scroll.ts
-@@ -0,0 +1,850 @@
+@@ -0,0 +1,852 @@
 +import browser from "./browser"
 +import type {Transaction} from "@codemirror/state"
 +import type {EditorView} from "./editorview"
@@ -172,7 +172,9 @@ index 0000000..85ac89b
 +                                             axisRatio = AxisRatio): ControlledTouchGestureClaim {
 +  let x = Math.abs(deltaX), y = Math.abs(deltaY)
 +  if (Math.max(x, y) < threshold) return "pending"
-+  return y >= x * axisRatio ? "vertical" : "horizontal"
++  // Native pan-x cannot provide vertical movement. Give ambiguous diagonals
++  // to the vertical controller, handing off only clearly horizontal swipes.
++  return x > y * axisRatio ? "horizontal" : "vertical"
 +}
 +
 +export type MomentumTermination = "completed" | "edge" | "render-limited" | "cancelled"

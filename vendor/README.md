@@ -12,7 +12,9 @@ implemented through public CodeMirror extensions.
 The view fork adds bounded directional buffering and Android touch scrolling
 with Android spline momentum. Acode uses `waitForRendering: false`: drag
 distance follows the finger immediately, release velocity uses touch-event
-timestamps, and normal viewport rendering runs independently. Two screens of
+timestamps, and normal viewport rendering runs independently. Near-diagonal
+swipes retain vertical scrolling; only clearly horizontal swipes are handed
+to native pan-x scrolling. Two screens of
 directional buffering limit render work. The old four-screen coverage gate is
 available with `waitForRendering: true` for diagnostic comparisons.
 Unrestricted momentum follows elapsed spline time through slow frames; the

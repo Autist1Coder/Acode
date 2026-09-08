@@ -8068,7 +8068,9 @@ function claimControlledTouchGesture(deltaX, deltaY, threshold = GestureThreshol
     let x = Math.abs(deltaX), y = Math.abs(deltaY);
     if (Math.max(x, y) < threshold)
         return "pending";
-    return y >= x * axisRatio ? "vertical" : "horizontal";
+    // Native pan-x cannot provide vertical movement. Give ambiguous diagonals
+    // to the vertical controller, handing off only clearly horizontal swipes.
+    return x > y * axisRatio ? "horizontal" : "vertical";
 }
 /**
 @internal
