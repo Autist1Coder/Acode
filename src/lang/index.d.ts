@@ -769,7 +769,10 @@ declare type LangStrings = {
   "pinned tab": string;
   "unpin tab before closing": string;
   "app font": string;
+  "app icon": string;
+  "app icon changed": string;
   "settings-info-app-font-family": string;
+  "settings-info-app-icon": string;
   "unsaved selected tabs warning": string;
   "save selected tabs": string;
   "close selected tabs": string;
@@ -839,6 +842,10 @@ declare type LangStrings = {
   "acode service": string;
   "horizontal scroll margin": string;
   "settings-info-horizontal-scroll-margin": string;
+  "confirm app icon reward": string;
+  "rewarded ad unavailable": string;
+  "rewarded ad failed": string;
+  "rewarded ad incomplete": string;
   "plugin-review:dialog-label": string;
   "plugin-review:account-check-failed": string;
   "plugin-review:sign-in": string;
